@@ -97,6 +97,10 @@ GEM
     debug (1.7.2)
       irb (>= 1.5.0)
       reline (>= 0.3.1)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     erubi (1.12.0)
     execjs (2.8.1)
     faker (3.2.0)
@@ -121,6 +125,7 @@ GEM
       activesupport (>= 5.0.0)
     json (2.6.3)
     kgio (2.11.4)
+    line-bot-api (1.28.0)
     loofah (2.20.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -288,11 +293,13 @@ DEPENDENCIES
   bootstrap_form
   capybara
   debug
+  dotenv-rails
   faker
   faker-japanese
   html2slim
   importmap-rails
   jbuilder
+  line-bot-api
   pg (~> 1.1)
   puma (~> 5.0)
   rails (~> 7.0.4, >= 7.0.4.3)
