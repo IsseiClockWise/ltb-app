@@ -1,3 +1,5 @@
+require 'line/bot'
+
 class TodosController < ApplicationController
   before_action :set_todo, only: %i[ show edit update destroy ]
 
@@ -22,17 +24,14 @@ class TodosController < ApplicationController
   # POST /todos or /todos.json
   def create
     @todo = Todo.new(todo_params)
-
-    respond_to do |format|
-      if @todo.save
-        format.html { redirect_to todo_url(@todo), notice: "Todo was successfully created." }
-        format.json { render :show, status: :created, location: @todo }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @todo.errors, status: :unprocessable_entity }
-      end
+  
+    if @todo.save
+      send_line_notification("ToDoが追加されました。タイトル: #{@todo.title}")
+      redirect_to @todo, notice: 'ToDoが作成されました。'
+    else
+      render :new
     end
-  end
+  end  
 
   # PATCH/PUT /todos/1 or /todos/1.json
   def update
@@ -66,5 +65,20 @@ class TodosController < ApplicationController
     # Only allow a list of trusted parameters through.
     def todo_params
       params.require(:todo).permit(:title, :content)
+    end
+
+    def send_line_notification(message)
+      client = Line::Bot::Client.new { |config|
+        config.channel_secret = ENV['LINE_CHANNEL_SECRET']
+        config.channel_token = ENV['LINE_CHANNEL_TOKEN']
+      }
+    
+      message = {
+        type: 'text',
+        text: message
+      }
+    
+      response = client.push_message(ENV['USER_LINE_ID'], message)
+      p response
     end
 end

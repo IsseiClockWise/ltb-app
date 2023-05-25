@@ -1,14 +1,13 @@
-require 'line/bot'
+class LineController < ApplicationController
+  protect_from_forgery except: [:webhook]
 
-class LineBotController < ApplicationController
-  protect_from_forgery with: :null_session
-
-  def callback
+  def webhook
     body = request.body.read
 
     signature = request.env['HTTP_X_LINE_SIGNATURE']
     unless client.validate_signature(body, signature)
-      return head :bad_request
+      head :bad_request
+      return
     end
 
     events = client.parse_events_from(body)
@@ -17,11 +16,7 @@ class LineBotController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
-          message = {
-            type: 'text',
-            text: event.message['text']
-          }
-          client.reply_message(event['replyToken'], message)
+          handle_text_message(event)
         end
       end
     end
@@ -33,8 +28,18 @@ class LineBotController < ApplicationController
 
   def client
     @client ||= Line::Bot::Client.new { |config|
-      config.channel_secret = ENV['YOUR_CHANNEL_SECRET']
-      config.channel_token = ENV['YOUR_CHANNEL_TOKEN']
+      config.channel_secret = ENV['LINE_CHANNEL_SECRET']
+      config.channel_token = ENV['LINE_CHANNEL_TOKEN']
     }
+  end
+
+  def handle_text_message(event)
+    message = {
+      type: 'text',
+      text: event.message['text']
+    }
+
+    response = client.reply_message(event['replyToken'], message)
+    p response
   end
 end
