@@ -1,4 +1,5 @@
 require 'line/bot'
+require 'line_notify'
 
 class TodosController < ApplicationController
   before_action :set_todo, only: %i[ show edit update destroy ]
@@ -36,8 +37,9 @@ class TodosController < ApplicationController
   # PATCH/PUT /todos/1 or /todos/1.json
   def update
     if @todo.update(todo_params)
-      send_line_notification("ToDoの情報が更新されました。タイトル: #{@todo.title}, 内容: #{@todo.content}")
-      redirect_to todo_url(@todo), notice: "ToDoの情報が更新されました。"
+      # 編集が成功した場合、通知を送信
+      send_line_notification2("ToDoが更新されました。タイトル: #{@todo.title}, 内容: #{@todo.content}")
+      redirect_to @todo, notice: 'ToDoが更新されました。'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -74,5 +76,10 @@ class TodosController < ApplicationController
       }
       response = client.push_message(ENV['USER_LINE_ID'], message)
       p response
+    end
+
+    def send_line_notification2(message)
+      token = ENV['LINE_NOTIFY_TOKEN']
+      LineNotify.notify(token, message)
     end
 end

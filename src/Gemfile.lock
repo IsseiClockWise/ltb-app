@@ -126,6 +126,7 @@ GEM
     json (2.6.3)
     kgio (2.11.4)
     line-bot-api (1.28.0)
+    line_notify (1.0.1)
     loofah (2.20.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -300,6 +301,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   line-bot-api
+  line_notify
   pg (~> 1.1)
   puma (~> 5.0)
   rails (~> 7.0.4, >= 7.0.4.3)
