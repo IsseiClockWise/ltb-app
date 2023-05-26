@@ -1,9 +1,15 @@
+require 'line/bot'
+
 class LineController < ApplicationController
   protect_from_forgery except: [:webhook]
 
   def webhook
     body = request.body.read
 
+    # ここでブレイクポイントを打っておく
+    # リクエストの中の変数を確認
+    # httpの内容をのぞく
+    # 登録時にユーザーIDがあればそれを使う
     signature = request.env['HTTP_X_LINE_SIGNATURE']
     unless client.validate_signature(body, signature)
       head :bad_request

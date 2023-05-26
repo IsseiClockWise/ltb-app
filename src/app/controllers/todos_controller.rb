@@ -26,7 +26,7 @@ class TodosController < ApplicationController
     @todo = Todo.new(todo_params)
   
     if @todo.save
-      send_line_notification("ToDoが追加されました。タイトル: #{@todo.title}")
+      send_line_notification("ToDoが追加されました。タイトル: #{@todo.title}, 内容: #{@todo.content}")
       redirect_to @todo, notice: 'ToDoが作成されました。'
     else
       render :new
@@ -35,25 +35,20 @@ class TodosController < ApplicationController
 
   # PATCH/PUT /todos/1 or /todos/1.json
   def update
-    respond_to do |format|
-      if @todo.update(todo_params)
-        format.html { redirect_to todo_url(@todo), notice: "Todo was successfully updated." }
-        format.json { render :show, status: :ok, location: @todo }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @todo.errors, status: :unprocessable_entity }
-      end
+    if @todo.update(todo_params)
+      send_line_notification("ToDoの情報が更新されました。タイトル: #{@todo.title}, 内容: #{@todo.content}")
+      redirect_to todo_url(@todo), notice: "ToDoの情報が更新されました。"
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
   # DELETE /todos/1 or /todos/1.json
   def destroy
+    send_line_notification("ToDoが削除されました。タイトル: #{@todo.title}, 内容: #{@todo.content}")
     @todo.destroy
 
-    respond_to do |format|
-      format.html { redirect_to todos_url, notice: "Todo was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to todos_url, notice: "ToDoが削除されました。"
   end
 
   private
@@ -72,12 +67,11 @@ class TodosController < ApplicationController
         config.channel_secret = ENV['LINE_CHANNEL_SECRET']
         config.channel_token = ENV['LINE_CHANNEL_TOKEN']
       }
-    
+
       message = {
         type: 'text',
         text: message
       }
-    
       response = client.push_message(ENV['USER_LINE_ID'], message)
       p response
     end
